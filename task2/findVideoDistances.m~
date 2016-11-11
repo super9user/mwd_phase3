@@ -1,0 +1,37 @@
+function allDistanceMap = findVideoDistances(videoMap, databaseMapSift)
+    allDistanceMap = containers.Map();
+    videoKeys = keys(videoMap);
+    n = length(videoKeys);
+    
+    for i=1:n
+        if(~isKey(allDistanceMap, videoKeys{i}))
+            allDistanceMap(videoKeys{i}) = containers.Map();
+        end
+        videoDistanceMap = allDistanceMap(videoKeys{i});
+        
+        video1 = videoMap(videoKeys{i}).videoReaderObject;
+        video1FrameCount = video1.numberOfFrames;
+        
+        for j=1:n
+            video2 = videoMap(videoKeys{j}).videoReaderObject;
+            video2FrameCount = video2.numberOfFrames;
+            video2Sift = databaseMapSift(videoKeys{j});
+            if i~=j
+                
+                if(~isKey(videoDistanceMap, videoKeys{j}))
+                    videoDistanceMap(videoKeys{j}) = repmat(10000, [video1FrameCount, video2FrameCount]);
+                end
+                
+                if ~isKey(databaseMapSift, videoKeys{i})
+                    video1Sift = databaseMapSift(videoKeys{i});
+                end
+                
+                    
+                videoDistanceArr = videoDistanceMap(videoKeys{j});
+                videoDistanceArr = findVideoToVideoDistance(video1Sift, video1FrameCount, video2Sift, video2FrameCount, videoDistanceArr);
+            end
+        end
+%         focusVideoMap = findDistanceMapWithOther(videoKeys{i}, videoMap, databaseMapSift);
+%         allDistanceMap(videoKeys{i}) = focusVideoMap;
+    end
+end
