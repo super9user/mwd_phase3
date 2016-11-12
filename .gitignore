@@ -1,5 +1,6 @@
 *.asv
 *.m~
 *.mex*
+.DS_Store
 slprj/
 octave-workspace
