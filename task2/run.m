@@ -16,15 +16,6 @@ function allVideoDistanceMap = run(videoFilePath, siftFilePath)
     databaseMapSift = getDataStructureForSift(siftFilePath);
     allVideoDistanceMap = findVideoDistances(videoMap, databaseMapSift);
     
-%     video1 = combineSift(databaseMapSift, v1);
-%     video2 = combineSift(databaseMapSift, v2);
-% 
-%     distanceSiftMap1 = computeDistanceSift(video1, video2, metric1);
-%     distanceSiftMap2 = computeDistanceSift(video1, video2, metric2);
-%     similaritySift1 = computeSimilaritySift(distanceSiftMap1, type1);
-%     similaritySift2 = computeSimilaritySift(distanceSiftMap2, type2);
-%     
-%     disp(similaritySift1);
-%     disp(similaritySift2);
+    [allVideoDistanceMatrix, allVideoDistanceReference] = combineAllDistanceMap(allVideoDistanceMap);
 end
 
