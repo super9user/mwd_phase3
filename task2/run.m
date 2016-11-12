@@ -1,4 +1,4 @@
-function run(videoFilePath, siftFilePath)
+function allVideoDistanceMap = run(videoFilePath, siftFilePath)
     
 %     videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
     
