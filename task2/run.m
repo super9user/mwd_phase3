@@ -1,6 +1,8 @@
 function allVideoDistanceMap = run(videoFilePath, siftFilePath)
     
 %     videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
+    global r;
+    r = 2;
     
     fileNames = dir(strcat(videoFilePath, '/*.mp4'));
     
