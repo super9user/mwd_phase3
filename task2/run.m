@@ -4,6 +4,8 @@ function run(videoFilePath, siftFilePath, k)
     global r;
     r = 2;
     
+    videoMap = getVideoMap(videoFilePath);
+    %{
     fileNames = dir(strcat(videoFilePath, '/*.mp4'));
     
     filesCount = length(fileNames);
@@ -13,6 +15,7 @@ function run(videoFilePath, siftFilePath, k)
         v = Video(fileNames(file).name, vr);
         videoMap(num2str(file)) = v;
     end
+    %}
     
 %     siftFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/filename.sift';
     databaseMapSift = getDataStructureForSift(siftFilePath);
@@ -30,7 +33,7 @@ function run(videoFilePath, siftFilePath, k)
 %     {va, vb, sim(a, b)}
 %     va = ?ia, ja? and vb = ?ib, jb?
 
-    fileID = fopen('filename d k.gspc', 'w');
+    fileID = fopen('filename_d_k.gspc', 'w');
     for i=1:totalFrames
         for j=0:k-1
             col = indices(i, end-j);
