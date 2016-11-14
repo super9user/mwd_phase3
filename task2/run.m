@@ -29,13 +29,16 @@ function run(videoFilePath, siftFilePath, k)
     
 %     {va, vb, sim(a, b)}
 %     va = ?ia, ja? and vb = ?ib, jb?
-    
+
+    fileID = fopen('filename d k.gspc', 'w');
     for i=1:totalFrames
         for j=0:k-1
             col = indices(i, end-j);
             referenceObj = allVideoDistanceReference(i, col);
-            fprintf('\n {<%d, %d>, <%d, %d>, %f}', referenceObj.sourceVideo, referenceObj.sourceFrame, referenceObj.destinationVideo, referenceObj.destinationFrame, sortedSimilarityMaxtrix(i, end-j));
+            fprintf(fileID, '\n{<%d, %d>, <%d, %d>, %f}', referenceObj.sourceVideo, referenceObj.sourceFrame, referenceObj.destinationVideo, referenceObj.destinationFrame, sortedSimilarityMaxtrix(i, end-j));
         end
     end
+    
+    fclose(fileID);
 end
 

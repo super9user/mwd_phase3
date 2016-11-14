@@ -7,8 +7,11 @@ function [ globalMap ] = getDataStructureForSift(fileName)
 
     globalMap = containers.Map();
     for i=1:length(strs)
+        
         newTxt = strtrim(strs{i});
-        [ videoNum, frameNum, cellNum, vector ] = cleanAndParseDataSift(strsplit(newTxt, ';'));
+        
+        if(~isempty(newTxt))
+            [ videoNum, frameNum, cellNum, vector ] = cleanAndParseDataSift(newTxt);
 
         if(videoNum == 0)
             continue;
@@ -31,6 +34,7 @@ function [ globalMap ] = getDataStructureForSift(fileName)
         array_vectors = vertcat(array_vectors, vector);
         frameMap(cellNum) = array_vectors;
 
+        end
     end
  
 end
