@@ -1,5 +1,5 @@
 function distance = findFrame2FrameDistance(video1frame, video2frame)
-    r=2;
+    global r;
     distance = 0;
     cellCount = r*r;
     
