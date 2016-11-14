@@ -1,4 +1,4 @@
-function allVideoDistanceMap = run(videoFilePath, siftFilePath)
+function run(videoFilePath, siftFilePath, k)
     
 %     videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
     global r;
@@ -19,5 +19,23 @@ function allVideoDistanceMap = run(videoFilePath, siftFilePath)
     allVideoDistanceMap = findVideoDistances(videoMap, databaseMapSift);
     
     [allVideoDistanceMatrix, allVideoDistanceReference] = combineAllDistanceMap(allVideoDistanceMap);
+    
+    allVideoSimilarityMatrix = 100 * (1 - normc(allVideoDistanceMatrix));
+    
+    [sortedSimilarityMaxtrix, indices] = sort(allVideoSimilarityMatrix, 2);
+    
+    graphSize = size(allVideoDistanceMatrix);
+    totalFrames = graphSize(1);
+    
+%     {va, vb, sim(a, b)}
+%     va = ?ia, ja? and vb = ?ib, jb?
+    
+    for i=1:totalFrames
+        for j=0:k-1
+            col = indices(i, end-j);
+            referenceObj = allVideoDistanceReference(i, col);
+            fprintf('\n {<%d, %d>, <%d, %d>, %f}', referenceObj.sourceVideo, referenceObj.sourceFrame, referenceObj.destinationVideo, referenceObj.destinationFrame, sortedSimilarityMaxtrix(i, end-j));
+        end
+    end
 end
 
