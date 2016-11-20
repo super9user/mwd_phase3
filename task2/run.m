@@ -1,23 +1,14 @@
-function run(videoFilePath, siftFilePath, k)
-    
-%     videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
+function run(videoMap, siftFilePath, k)
+    tic
+%   videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
+%   /Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/test/videos
     global r;
     r = 2;
     
-    videoMap = getVideoMap(videoFilePath);
-    %{
-    fileNames = dir(strcat(videoFilePath, '/*.mp4'));
+%     videoMap = getVideoMap(videoFilePath);
+%   siftFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/filename.sift';
+%   /Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/mwd_phase3/task1/filename_d.spca
     
-    filesCount = length(fileNames);
-    videoMap = containers.Map();
-    for file=1:filesCount
-        vr = VideoReader(strcat(videoFilePath,'/',fileNames(file).name));
-        v = Video(fileNames(file).name, vr);
-        videoMap(num2str(file)) = v;
-    end
-    %}
-    
-%     siftFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/filename.sift';
     databaseMapSift = getDataStructureForSift(siftFilePath);
     allVideoDistanceMap = findVideoDistances(videoMap, databaseMapSift);
     
@@ -43,5 +34,5 @@ function run(videoFilePath, siftFilePath, k)
     end
     
     fclose(fileID);
+    toc
 end
-
