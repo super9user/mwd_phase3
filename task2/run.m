@@ -31,15 +31,15 @@ function run(videoMap, siftFilePath, k, databaseMapSift)
             columnIndex = totalFrames - j;
             col = indices(i, columnIndex);
             referenceObj = allVideoDistanceReference(i, col);
-            sourceVideo = str2double(referenceObj.sourceVideo);
-            destinationVideo = str2double(referenceObj.destinationVideo);
+            sourceVideo = referenceObj.sourceVideo;
+            destinationVideo = referenceObj.destinationVideo;
             
             while(sourceVideo == destinationVideo)
                 columnIndex = columnIndex - 1;
                 col = indices(i, columnIndex);
                 referenceObj = allVideoDistanceReference(i, col);
-                sourceVideo = referenceObj.sourceVideo);
-                destinationVideo = referenceObj.destinationVideo);
+                sourceVideo = referenceObj.sourceVideo;
+                destinationVideo = referenceObj.destinationVideo;
             end
             
             fprintf(fileID, '\n{<%d, %d>, <%d, %d>, %f}', referenceObj.sourceVideo, referenceObj.sourceFrame, referenceObj.destinationVideo, referenceObj.destinationFrame, sortedSimilarityMaxtrix(i, end-j));
