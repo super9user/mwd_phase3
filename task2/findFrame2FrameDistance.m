@@ -12,7 +12,7 @@ function distance = findFrame2FrameDistance(video1frame, video2frame)
 %                 cellDistance = findCell2CellDistance(frame1cell, frame2cell);
                 cellDistanceMatrix = pdist2(frame1cell, frame2cell);
                 dim = size(cellDistanceMatrix);
-                totalVectors = sum(dim);
+                totalVectors = dim(1)*dim(2);
                 cellDistance = sum(cellDistanceMatrix);
                 cellDistance = sum(cellDistance)/totalVectors;
             end

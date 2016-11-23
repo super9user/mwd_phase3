@@ -19,7 +19,7 @@ function allDistanceMap = findVideoDistances(videoMap, databaseMapSift)
             if i~=j
                 
                 if(~isKey(videoDistanceMap, videoKeys{j}))
-                    videoDistanceMap(videoKeys{j}) = repmat(10000, [video1FrameCount, video2FrameCount]);
+                    videoDistanceMap(videoKeys{j}) = repmat(100000, [video1FrameCount, video2FrameCount]);
                 end
                 
                 videoDistanceArr = videoDistanceMap(videoKeys{j});

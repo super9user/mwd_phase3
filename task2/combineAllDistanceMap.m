@@ -10,7 +10,7 @@ function [allVideoDistanceMatrix, allVideoDistanceReference] = combineAllDistanc
         focusVideoKeys = keys(focusVideoDistanceMap);
         videoSize = size(focusVideoDistanceMap(focusVideoKeys{1}));
         focusVideoFrameCount = videoSize(1);
-        selfDistanceMatrix = repmat(10000, [focusVideoFrameCount, focusVideoFrameCount]);
+        selfDistanceMatrix = repmat(100000, [focusVideoFrameCount, focusVideoFrameCount]);
 %         sourceVideo = i;
         rowMatrix = [];
         

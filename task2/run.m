@@ -1,4 +1,4 @@
-function run(videoMap, siftFilePath, k)
+function run(videoMap, siftFilePath, k, databaseMapSift)
     tic
 %   videoFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/DataR';
 %   /Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/test/videos
@@ -9,7 +9,8 @@ function run(videoMap, siftFilePath, k)
 %   siftFilePath = '/Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/filename.sift';
 %   /Users/jaiswalhome/satyam/masters/fall2016/CSE515-MWDb/project/sourcecode/Phase3/mwd_phase3/task1/filename_d.spca
     
-    databaseMapSift = getDataStructureForSift(siftFilePath);
+
+%     databaseMapSift = getDataStructureForSift(siftFilePath);
     allVideoDistanceMap = findVideoDistances(videoMap, databaseMapSift);
     
     [allVideoDistanceMatrix, allVideoDistanceReference] = combineAllDistanceMap(allVideoDistanceMap);
@@ -27,8 +28,20 @@ function run(videoMap, siftFilePath, k)
     fileID = fopen('filename_d_k.gspc', 'w');
     for i=1:totalFrames
         for j=0:k-1
-            col = indices(i, end-j);
+            columnIndex = totalFrames - j;
+            col = indices(i, columnIndex);
             referenceObj = allVideoDistanceReference(i, col);
+            sourceVideo = str2double(referenceObj.sourceVideo);
+            destinationVideo = str2double(referenceObj.destinationVideo);
+            
+            while(sourceVideo == destinationVideo)
+                columnIndex = columnIndex - 1;
+                col = indices(i, columnIndex);
+                referenceObj = allVideoDistanceReference(i, col);
+                sourceVideo = referenceObj.sourceVideo);
+                destinationVideo = referenceObj.destinationVideo);
+            end
+            
             fprintf(fileID, '\n{<%d, %d>, <%d, %d>, %f}', referenceObj.sourceVideo, referenceObj.sourceFrame, referenceObj.destinationVideo, referenceObj.destinationFrame, sortedSimilarityMaxtrix(i, end-j));
         end
     end
