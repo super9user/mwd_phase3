@@ -1,12 +1,10 @@
-function [pageRank,out]=findPageRank(video,frame,pageRankMat)
+function [pageRank,out]=findPageRank(video,frame,GM)
 
-[x y]=size(pageRankMat);
-
-for i=1:y
-    obj=pageRankMat(i);
-    if(obj.videoNum==video && obj.frameNum==frame)
-        pageRank=obj.pageRankValue;
-        out=obj.outweight;
-        break;
-    end
+videostr=num2str(video);
+framestr=num2str(frame);
+mapKey=strcat(videostr,',',framestr);
+obj=GM(mapKey);
+pageRank=obj.pageRankValue;
+out=obj.outweight;
+    
 end

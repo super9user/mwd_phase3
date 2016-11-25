@@ -1,17 +1,21 @@
-function summation=  findSummation(obj,a,pageRankMat)
+function summation=  findSummation(obj,GM,GIM) % current object, GM=globalPageRankMap, GIM= globalIncomingMatrix
 
-[x y]= size(a);
 summation=0;
 targetV=obj.videoNum;
 targetF=obj.frameNum;
-    for i=1:x
-        for j=1:y        
-        adjNode=a(i,j);
-        if(adjNode.destinationVideo==targetV && adjNode.destinationFrame==targetF)
-            wx=adjNode.simValue;
-            [pageRank, outweigh]=findPageRank(adjNode.sourceVideo,adjNode.sourceFrame,pageRankMat);
-            summation=summation+(wx*pageRank/outweigh);
-        end
+videostr=num2str(targetV);
+framestr=num2str(targetF);
+mapKey=strcat(videostr,',',framestr);
+if(isKey(GIM, mapKey))
+    objectArray=GIM(mapKey);
+    [u, v]= size(objectArray);
 
+    for i=1:v
+        adjNode=objectArray(i);
+            wx=adjNode.simValue;
+            [pageRank, outweigh]=findPageRank(adjNode.sourceVideo,adjNode.sourceFrame,GM);
+            summation=summation+(wx*pageRank/outweigh);
     end
+    
+end
 end
