@@ -1,23 +1,14 @@
-function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
+function [ ] = task4( videoDirectory, dataFileName, m)
 
-    text=fileread(dataFileName);
-    text = strrep(text,'<','');
-    text = strrep(text,'>','');
-    text = strrep(text,'{','');
-    text = strrep(text,'}','');
+   Graph = preProcess(dataFileName);
 
-    fileID = fopen('temp.txt','w');
-    fprintf(fileID,text);
-    fclose(fileID);
-    M = csvread('temp.txt');
-
-    [numPoints, ~]=size(M);
-    startingVideo=M(1,1);
-    startingFrame=M(1,2);
+    [numPoints, ~]=size(Graph);
+    startingVideo=Graph(1,1);
+    startingFrame=Graph(1,2);
     k=0;
     for i=1:numPoints
-        x1=M(i,1);
-        x2=M(i,2);
+        x1=Graph(i,1);
+        x2=Graph(i,2);
         if(x1==startingVideo && x2==startingFrame)
             k=k+1;
         else
@@ -27,6 +18,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
 
     z=1;
     d=0.85;
+    beta = 0.15;
     totalNodes = numPoints/k;
     clear videoRefMatrix;
 
@@ -35,7 +27,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
 
     for i=1:totalNodes
         for j=1:k    
-            x=M(z+j-1,1:5);
+            x=Graph(z+j-1,1:5);
             videostr=num2str(x(3));
             framestr=num2str(x(4));
             keystr=strcat(videostr,',',framestr);
