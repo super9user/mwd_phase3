@@ -12,9 +12,20 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
     M = csvread('temp.txt');
 
     [numPoints, ~]=size(M);
-    k=3;
-    z=1;
+    startingVideo=M(1,1);
+    startingFrame=M(1,2);
+    k=0;
+    for i=1:numPoints
+        x1=M(i,1);
+        x2=M(i,2);
+        if(x1==startingVideo && x2==startingFrame)
+            k=k+1;
+        else
+            break;
+        end
+    end
 
+    z=1;
     d=0.85;
     totalNodes = numPoints/k;
     clear videoRefMatrix;
