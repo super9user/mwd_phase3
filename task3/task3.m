@@ -12,8 +12,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
     M = csvread('temp.txt');
 
     [numPoints, ~]=size(M);
-    k=5;
-    numPoint
+    k=3;
     z=1;
 
     d=0.85;
@@ -67,28 +66,41 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
             strFrame=num2str(obj.frameNum);
             mapK=strcat(strVideo,',',strFrame);
             summation=findSummation(obj,globalPageRankMap,globalIncomingMatrix);
-            pagerank=1-d+d*summation;
+            pagerank= (1-d) + (d*summation);
             globalPageRankMap(mapK)= VideoNode(obj.videoNum,obj.frameNum,pagerank,obj.outweight);
         end
     end
     
-%     [~,idx]=sort([pageRankMatrix.pageRankValue],'descend');
+    allPageRanks = zeros(1,totalNodes);
+    allPageRanksMapping = {};
+    prKeys = keys(globalPageRankMap);
+    for i=1:length(prKeys)
+        tmp = prKeys(i);
+        currObj = globalPageRankMap(tmp{1});
+        allPageRanks(i) = currObj.pageRankValue;
+        allPageRanksMapping{i} = currObj;
+    end
+
+    [~,idx]=sort(allPageRanks,'descend');
 %     orderedPageRank=pageRankMatrix(idx);
 
-%     for j=1:m
-%         pageRankObject=orderedPageRank(j);
-%         videoNum=pageRankObject.videoNum;
-%         frameNum=pageRankObject.frameNum;
-%         vidKey=globalVideoIndex(num2str(videoNum));
-%         videoObj=VideoReader(strcat(videoDirectory,vidKey));
-%         img=read(videoObj,frameNum);
-%         pageRank=strcat(' PageRank - ',num2str(pageRankObject.pageRankValue)); 
-%         videostr=strcat (' Video Number - ',num2str(videoNum));
-%         videoName=strcat(' Video Name - ',vidKey);
-%         frameName=strcat (' Frame Number - ',num2str(frameNum));
-%         title(strcat(videoName,videostr,frameName,pageRank));
-%         figure, imshow(img);
-%         imwrite(img,'pageRankFrames.tif','WriteMode','append');
-%     end
+    for j=1:m
+        currIdx = idx(j);
+        obj = allPageRanksMapping(currIdx);
+        pageRankObject = obj{1};
+
+        videoNum=pageRankObject.videoNum;
+        frameNum=pageRankObject.frameNum;
+        vidKey=globalVideoIndex(num2str(videoNum));
+        videoObj=VideoReader(strcat(videoDirectory,vidKey));
+        img=read(videoObj,frameNum);
+        pageRank=strcat(' PageRank - ',num2str(pageRankObject.pageRankValue)); 
+        videostr=strcat (' Video Number - ',num2str(videoNum));
+        videoName=strcat(' Video Name - ',vidKey);
+        frameName=strcat (' Frame Number - ',num2str(frameNum));
+        title(strcat(videoName,videostr,frameName,pageRank));
+        figure, imshow(img);
+        imwrite(img,'pageRankFrames.tif','WriteMode','append');
+    end
     
 end
