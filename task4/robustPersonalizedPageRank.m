@@ -1,8 +1,8 @@
-function [ rprScore ] = robustPersonalizedPageRank( seed1 )
+function [ rprScore ] = robustPersonalizedPageRank( seed1, seed2 )
 %robustPersonalizedPageRank RPR-2
 %   Detailed explanation goes here
 
-    seedSet = [seed1];
+    seedSet = [seed1 seed2];
     seedSetSize = length(seedSet);
 
 %     X = [[0 1 0 0 0]; [1 0 0 0 0 ]; [0 1 0 0 0]; [0 0 1 0 1]; [0 0 0 1 0]];

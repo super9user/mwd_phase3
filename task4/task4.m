@@ -1,104 +1,141 @@
-function [ ] = task4( videoDirectory, dataFileName, m)
+function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2Str, seed3Str )
 
-   Graph = preProcess(dataFileName);
+    InputMatrix = preProcess(dataFileName);
 
-    [numPoints, ~]=size(Graph);
-    startingVideo=Graph(1,1);
-    startingFrame=Graph(1,2);
+    [numPoints, ~]=size(InputMatrix);
+    startingVideo=InputMatrix(1,1);
+    startingFrame=InputMatrix(1,2);
     k=0;
     for i=1:numPoints
-        x1=Graph(i,1);
-        x2=Graph(i,2);
+        x1=InputMatrix(i,1);
+        x2=InputMatrix(i,2);
         if(x1==startingVideo && x2==startingFrame)
             k=k+1;
         else
             break;
         end
     end
+    
+    clear nodeVideoMapping;
 
     z=1;
-    d=0.85;
-    beta = 0.15;
     totalNodes = numPoints/k;
-    clear videoRefMatrix;
-
-    globalIncomingMatrix=containers.Map(); % map where incoming node is the key
-    globalPageRankMap= containers.Map(); % map where every node( 'video,frame' is a key)
-
+    
+    indexMapping = containers.Map();
     for i=1:totalNodes
-        for j=1:k    
-            x=Graph(z+j-1,1:5);
-            videostr=num2str(x(3));
-            framestr=num2str(x(4));
-            keystr=strcat(videostr,',',framestr);
-
-            o=VideoReference(x(1),x(2),x(3),x(4),x(5));
-            videoRefMatrix(i,j)=o;
-            if(~isKey(globalIncomingMatrix, keystr))
-                globalIncomingMatrix(keystr) = [o];
-            else
-                array=globalIncomingMatrix(keystr);
-                array=[array o];
-                globalIncomingMatrix(keystr)=array;
-            end
-        end
+        currentRow = InputMatrix(z,:);
+        vidNum = currentRow(1);
+        frameNum = currentRow(2);
+        nodeVideoMapping(i) = VideoNode(vidNum, frameNum);
+        keystr = strcat(num2str(vidNum),',',num2str(frameNum));
+        indexMapping(keystr) = i;
         z=z+k;
     end
-
+    
+    % Fill transition matrix X
+    X = zeros(totalNodes,totalNodes);
+    z=1;
     for i=1:totalNodes
-        obj=videoRefMatrix(i);
-        sum=0;
         for j=1:k
-            sum=sum+videoRefMatrix(i,j).simValue;
-        end
-        videoNum=obj.sourceVideo;
-        strVideo=num2str(videoNum);
-        frameNum=obj.sourceFrame;
-        strNum=num2str(frameNum);
-        pagerankvalue=1/numPoints/k;
-        mapKey=strcat(strVideo,',',strNum);
-        globalPageRankMap(mapKey)= VideoNode(videoNum,frameNum,pagerankvalue,sum);  
-        pageRankMatrix(i)=VideoNode(videoNum,frameNum,pagerankvalue,sum);
-    end
-
-    for i=1:100 % no of iterations
-        i
-        for j=1:totalNodes       
-            obj=pageRankMatrix(j);
-            strVideo=num2str(obj.videoNum);
-            strFrame=num2str(obj.frameNum);
-            mapK=strcat(strVideo,',',strFrame);
-            summation=findSummation(obj,globalPageRankMap,globalIncomingMatrix);
-            pagerank= (1-d) + (d*summation);
-            globalPageRankMap(mapK)= VideoNode(obj.videoNum,obj.frameNum,pagerank,obj.outweight);
+            currentRow = InputMatrix(z,:);
+            sourceVidNum = currentRow(1);
+            sourceFrameNum = currentRow(2);
+            destVidNum = currentRow(3);
+            destFrameNum = currentRow(4);
+            simValue = currentRow(5);
+            
+            sourceKeystr = strcat(num2str(sourceVidNum),',',num2str(sourceFrameNum));
+            destKeystr = strcat(num2str(destVidNum),',',num2str(destFrameNum));
+            
+            sourceIndex = indexMapping(sourceKeystr);
+            destIndex = indexMapping(destKeystr);
+            
+            X(sourceIndex, destIndex) = simValue;
+            z=z+1;
         end
     end
     
-    allPageRanks = zeros(1,totalNodes);
-    allPageRanksMapping = {};
-    prKeys = keys(globalPageRankMap);
-    for i=1:length(prKeys)
-        tmp = prKeys(i);
-        currObj = globalPageRankMap(tmp{1});
-        allPageRanks(i) = currObj.pageRankValue;
-        allPageRanksMapping{i} = currObj;
+    seed1 = indexMapping(seed1Str);
+    seed2 = indexMapping(seed2Str);
+    seed3 = indexMapping(seed3Str);
+    seedSet = [seed1 seed2 seed3];
+    seedSetSize = length(seedSet);
+    
+    beta = 0.15;
+    maxIter = 100;
+    [n, ~] = size(X);
+    
+    ESet = zeros(seedSetSize, n);
+    
+    for i=1:seedSetSize
+        seed = seedSet(i);
+        currE = ESet(i,:);
+        currSeed = seedSet(i);
+        for j=1:n
+            if(j == currSeed)
+                currE(1, j) = 1; % Should this be really 1?
+            end
+        end
+        ESet(i,:) = currE;
+    end
+    
+    pagerankSet = zeros(seedSetSize, n);
+    for i=1:seedSetSize
+        pagerankSet(i,:) = ones(1,n) * 1/n;
     end
 
-    [~,idx]=sort(allPageRanks,'descend');
-%     orderedPageRank=pageRankMatrix(idx);
+    for i=1:maxIter
+        disp(i);
+        for j=1:seedSetSize
+            currPRSet = pagerankSet(j,:);
+            currE = ESet(j,:);
+            currPRSet = (1 - beta)*currPRSet*X + beta*currE;
+            pagerankSet(j,:) = currPRSet;
+        end
+    end
+    
+    prodVect = zeros(1,seedSetSize);
+    for i=1:seedSetSize
+        currPR = pagerankSet(i,:);
+        sum = 0;
+        for j=1:seedSetSize
+            sum = sum + currPR(j);
+        end
+        prodVect(i) = sum;
+    end
+    
+    % Restart set
+    maxVal = max(prodVect);
+    scrit = find(prodVect == maxVal);
+    
+    if(length(scrit) == 1)
+        index = scrit(1);
+        rprScore = pagerankSet(index,:);
+    else
+      normScrit = norm(scrit);
+      summation = 0;
+      for i=1:length(scrit)
+          currIndex = scrit(i);
+          currPR = pagerankSet(currIndex,:);
+          summation = summation + currPR;
+      end
+      rprScore = summation / normScrit;
+    end
 
+    [prValues, idx]=sort(rprScore, 'descend');
+    
     load 'globalVideoIndex.mat';
     for j=1:m
         currIdx = idx(j);
-        obj = allPageRanksMapping(currIdx);
-        pageRankObject = obj{1};
+        pageRankObject = nodeVideoMapping(currIdx);
 
         videoNum=pageRankObject.videoNum;
         frameNum=pageRankObject.frameNum;
         vidKey=globalVideoIndex(num2str(videoNum));
+        
         videoObj=VideoReader(strcat(videoDirectory,vidKey));
         img=read(videoObj,frameNum);
-        pageRank=strcat(' PageRank - ',num2str(pageRankObject.pageRankValue)); 
+        pageRank=strcat(' PageRank - ',num2str(prValues(currIdx))); 
         videostr=strcat (' Video Number - ',num2str(videoNum));
         videoName=strcat(' Video Name - ',vidKey);
         frameName=strcat (' Frame Number - ',num2str(frameNum));
@@ -108,3 +145,4 @@ function [ ] = task4( videoDirectory, dataFileName, m)
     end
     
 end
+
