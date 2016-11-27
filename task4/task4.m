@@ -59,68 +59,9 @@ function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2S
     seed2 = indexMapping(seed2Str);
     seed3 = indexMapping(seed3Str);
     seedSet = [seed1 seed2 seed3];
-    seedSetSize = length(seedSet);
     
-    beta = 0.15;
-    maxIter = 100;
-    [n, ~] = size(X);
-    
-    ESet = zeros(seedSetSize, n);
-    
-    for i=1:seedSetSize
-        seed = seedSet(i);
-        currE = ESet(i,:);
-        currSeed = seedSet(i);
-        for j=1:n
-            if(j == currSeed)
-                currE(1, j) = 1; % Should this be really 1?
-            end
-        end
-        ESet(i,:) = currE;
-    end
-    
-    pagerankSet = zeros(seedSetSize, n);
-    for i=1:seedSetSize
-        pagerankSet(i,:) = ones(1,n) * 1/n;
-    end
-
-    for i=1:maxIter
-        disp(i);
-        for j=1:seedSetSize
-            currPRSet = pagerankSet(j,:);
-            currE = ESet(j,:);
-            currPRSet = (1 - beta)*currPRSet*X + beta*currE;
-            pagerankSet(j,:) = currPRSet;
-        end
-    end
-    
-    prodVect = zeros(1,seedSetSize);
-    for i=1:seedSetSize
-        currPR = pagerankSet(i,:);
-        sum = 0;
-        for j=1:seedSetSize
-            sum = sum + currPR(j);
-        end
-        prodVect(i) = sum;
-    end
-    
-    % Restart set
-    maxVal = max(prodVect);
-    scrit = find(prodVect == maxVal);
-    
-    if(length(scrit) == 1)
-        index = scrit(1);
-        rprScore = pagerankSet(index,:);
-    else
-      normScrit = norm(scrit);
-      summation = 0;
-      for i=1:length(scrit)
-          currIndex = scrit(i);
-          currPR = pagerankSet(currIndex,:);
-          summation = summation + currPR;
-      end
-      rprScore = summation / normScrit;
-    end
+    % Run RPR-2 algo
+    rprScore = robustPersonalizedPageRank(X, seedSet);
 
     [prValues, idx]=sort(rprScore, 'descend');
     
