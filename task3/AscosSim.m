@@ -1,4 +1,5 @@
 %function [ ascosRank ] = Ascos(dataFileName, k, m)
+tic
 k=5;
 m=3;
 text=fileread('filename_d_k.gspc');
@@ -69,30 +70,35 @@ for i=1:totalNodes
     end
 end
 ascosRankIndex = containers.Map();
-for i=1:5 % no of iterations
+frameVideoArray = frameVideos();
+counter = size(frameVideoArray, 2);
+for i=1:1 % no of iterations
    count = 1;
-   for j=1:totalNodes       
-    obj=ascosRankMatrix(j);
-    sVideo=num2str(obj.sVideoNum);
-    sFrame=num2str(obj.sFrameNum);
-    dVideo = num2str(obj.dVideoNum);
-    dFrame = num2str(obj.dFrameNum);
-    mapK=strcat(sVideo,',',sFrame,',',dVideo,',',dFrame);
-    ascosRank=c*findSum(obj, globalAscosRankMap, globalOutgoingMatrix);
-    if i == 5
-        if ascosRank > 0
-            rKey = strcat(dVideo,',',dFrame);
-            rKey
-            if(isKey(ascosRankIndex, rKey))
-                temp = ascosRankIndex(rKey);
-                temp = temp + ascosRank;
-                ascosRankIndex(rKey) = temp;
-            else
-                ascosRankIndex(rKey) = ascosRank;
+   for j=1:counter
+       objI=frameVideoArray(j);       
+       for k = 1:counter
+        objJ = frameVideoArray(k);
+        sVideo=num2str(objI.video);
+        sFrame=num2str(objI.frame);
+        dVideo = num2str(objJ.video);
+        dFrame = num2str(objJ.frame);
+        mapK=strcat(sVideo,',',sFrame,',',dVideo,',',dFrame);
+        mapK
+        ascosRank=c*findSum(objI, objJ, globalAscosRankMap, globalOutgoingMatrix);
+        if i == 5
+            if ascosRank > 0
+                rKey = strcat(dVideo,',',dFrame);
+                if(isKey(ascosRankIndex, rKey))
+                    temp = ascosRankIndex(rKey);
+                    temp = temp + ascosRank;
+                    ascosRankIndex(rKey) = temp;
+                else
+                    ascosRankIndex(rKey) = ascosRank;
+                end
             end
         end
-    end
-    globalAscosRankMap(mapK)= AscosVideoNode(obj.sVideoNum,obj.sFrameNum, obj.dVideoNum, obj.dFrameNum, ascosRank);  
+        globalAscosRankMap(mapK)= AscosVideoNode(sVideo, sFrame, dVideo, dFrame, ascosRank);  
+       end
    end
 end
 rKeys = keys(ascosRankIndex);
@@ -108,3 +114,4 @@ arraySize = size(arrayAscos, 2);
 for random = 1:arraySize
     disp(arrayAscos(index(random)));
 end
+toc
