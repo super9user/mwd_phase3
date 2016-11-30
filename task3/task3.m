@@ -10,7 +10,15 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
     fprintf(fileID,text);
     fclose(fileID);
     M = csvread('temp.txt');
-
+    M_VideoMapFile=csvread('video_mappings_task3.csv');
+    globalVideoIndex=containers.Map();
+    for i=1:size(M_VideoMapFile)
+     x=M_VideoMapFile(i,:);
+     key=num2str(x(1));
+     vidnum=num2str(x(2));
+     videostr=strcat(vidnum,'.mp4');
+     globalVideoIndex(key)=videostr;
+    end
     [numPoints, ~]=size(M);
     startingVideo=M(1,1);
     startingFrame=M(1,2);
@@ -32,7 +40,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
 
     globalIncomingMatrix=containers.Map(); % map where incoming node is the key
     globalPageRankMap= containers.Map(); % map where every node( 'video,frame' is a key)
-
+ 
     for i=1:totalNodes
         for j=1:k    
             x=M(z+j-1,1:5);
@@ -69,7 +77,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
         pageRankMatrix(i)=VideoNode(videoNum,frameNum,pagerankvalue,sum);
     end
 
-    for i=1:100 % no of iterations
+    for i=1:10 % no of iterations
         i
         for j=1:totalNodes       
             obj=pageRankMatrix(j);
@@ -95,7 +103,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
     [~,idx]=sort(allPageRanks,'descend');
 %     orderedPageRank=pageRankMatrix(idx);
 
-    load 'globalVideoIndex.mat';
+%     load 'globalVideoIndex.mat';
     for j=1:m
         currIdx = idx(j);
         obj = allPageRanksMapping(currIdx);
