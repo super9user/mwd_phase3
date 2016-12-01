@@ -1,6 +1,11 @@
 function [ pv ] = personalizedPageRank(  )
 
-    X = [[0 1 0 0 0]; [1 0 0 0 0 ]; [0 1 0 0 0]; [0 0 1 0 1]; [0 0 0 1 0]];
+    X = [[0 1 0 0 0]; 
+        [1 0 0 0 0 ]; 
+        [0 1 0 0 0]; 
+        [0 0 1 0 1]; 
+        [0 0 0 1 0]];
+    
     [n, ~] = size(X);
     Seed = 1; % Node 1 is a seed node
     beta = 0.15;
