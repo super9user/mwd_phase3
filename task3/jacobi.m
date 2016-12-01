@@ -1,4 +1,4 @@
-function X=jacobi(A,B,P,delta, max1)
+function [X] = jacobi(A, B, P, delta, maxIters)
 
 % Input  - A is an N x N nonsingular matrix
 %        - B is an N x 1 matrix
@@ -10,26 +10,26 @@ function X=jacobi(A,B,P,delta, max1)
 
 
 % NUMERICAL METHODS: MATLAB Programs
-%(c) 1999 by John H. Mathews and Kurtis D. Fink
-%To accompany the textbook:
-%NUMERICAL METHODS Using MATLAB,
-%by John H. Mathews and Kurtis D. Fink
-%ISBN 0-13-270042-5, (c) 1999
-%PRENTICE HALL, INC.
-%Upper Saddle River, NJ 07458
+% (c) 1999 by John H. Mathews and Kurtis D. Fink
+% To accompany the textbook:
+% NUMERICAL METHODS Using MATLAB,
+% by John H. Mathews and Kurtis D. Fink
+% ISBN 0-13-270042-5, (c) 1999
+% PRENTICE HALL, INC.
+% Upper Saddle River, NJ 07458
 
-N = length(B);
+    N = length(B);
+    for k=1:maxIters
+        for j=1:N
+            X(j)= (B(j) - A(j,[1:j-1,j+1:N]) * P([1:j-1,j+1:N])) / A(j,j);
+        end
+        err=abs(norm(X'-P));
+        relerr=err/(norm(X)+eps);
+        P=X';
+        if (err<delta) || (relerr<delta)
+            break;
+        end
+    end
 
-for k=1:max1
-   for j=1:N
-      X(j)=(B(j)-A(j,[1:j-1,j+1:N])*P([1:j-1,j+1:N]))/A(j,j);
-   end
-   err=abs(norm(X'-P));
-   relerr=err/(norm(X)+eps);
-   P=X';
-      if (err<delta)|(relerr<delta)
-     break
-   end
+    X=X';
 end
-
-X=X';

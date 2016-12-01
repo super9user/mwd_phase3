@@ -1,6 +1,5 @@
-%function [] = ascosMeasures()
-tic
-InputMatrix = preProcess('filename_d_k.gspc');
+function [] = ascosMeasures()
+    InputMatrix = preProcess('filename_d_k.gspc');
 
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
@@ -15,11 +14,10 @@ InputMatrix = preProcess('filename_d_k.gspc');
             break;
         end
     end
-    
 
     z=1;
     totalNodes = numPoints/k;
-    
+
     indexMapping = containers.Map();
     for i=1:totalNodes
         currentRow = InputMatrix(z,:);
@@ -29,7 +27,7 @@ InputMatrix = preProcess('filename_d_k.gspc');
         indexMapping(keystr) = i;
         z=z+k;
     end
-    
+
     % Fill transition matrix X
     X = zeros(totalNodes,totalNodes);
     z=1;
@@ -41,18 +39,19 @@ InputMatrix = preProcess('filename_d_k.gspc');
             destVidNum = currentRow(3);
             destFrameNum = currentRow(4);
             simValue = currentRow(5);
-            
+
             sourceKeystr = strcat(num2str(sourceVidNum),',',num2str(sourceFrameNum));
             destKeystr = strcat(num2str(destVidNum),',',num2str(destFrameNum));
-            
+
             sourceIndex = indexMapping(sourceKeystr);
             destIndex = indexMapping(destKeystr);
-            
+
             X(sourceIndex, destIndex) = simValue;
             X(destIndex, sourceIndex) = simValue;
             z=z+1;
         end
     end
+    
     GuessMatrix = X;
     adjMatrix = X;
     clear X;
@@ -64,16 +63,18 @@ InputMatrix = preProcess('filename_d_k.gspc');
     IdentityMat = eye(size(adjMatrix, 1));
     c = 0.9;
     AMatrix = (IdentityMat - (c .* Q'));
+    
     parfor i = 1:size(adjMatrix, 1)
         i
         BMatrix = (1 - c)*IdentityMat(:,i);
         Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 25);
     end
-   %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
-   %Sort the objects and retrieve top n
-   sumColumns = sum(Sim);
-   keysIndex = keys(indexMapping);
-   for i = 1:size(keysIndex, 2)
+    
+    %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
+    %Sort the objects and retrieve top n
+    sumColumns = sum(Sim);
+    keysIndex = keys(indexMapping);
+    for i = 1:size(keysIndex, 2)
         index = indexMapping(char(keysIndex(i)));
         vidFrame = keysIndex(i);
         vidFrame = strsplit(char(vidFrame), ',');
@@ -81,11 +82,11 @@ InputMatrix = preProcess('filename_d_k.gspc');
         frameNum = vidFrame(2);
         ascosM = sumColumns(index);
         arrayAscos(i) = AscosRank(videoNum, frameNum, ascosM);
-   end
-   arraySize = size(arrayAscos, 2);
-   [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
-   for random = 1:arraySize
+    end
+    
+    arraySize = size(arrayAscos, 2);
+    [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
+    for random = 1:arraySize
         disp(arrayAscos(index(random)));
-   end
-  toc
-%end
+    end
+end
