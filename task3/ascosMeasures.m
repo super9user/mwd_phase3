@@ -1,6 +1,6 @@
 function [] = ascosMeasures()
+    tic;
     InputMatrix = preProcess('filename_d_k.gspc');
-
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
     startingFrame=InputMatrix(1,2);
@@ -51,6 +51,7 @@ function [] = ascosMeasures()
             z=z+1;
         end
     end
+    toc;
     
     GuessMatrix = X;
     adjMatrix = X;
@@ -64,29 +65,31 @@ function [] = ascosMeasures()
     c = 0.9;
     AMatrix = (IdentityMat - (c .* Q'));
     
+    clear Sim;
+    tic;
     parfor i = 1:size(adjMatrix, 1)
-        i
-        BMatrix = (1 - c)*IdentityMat(:,i);
-        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 25);
+        BMatrix = (1 - c) * IdentityMat(:,i);
+        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 10);
     end
+    toc;
     
-    %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
-    %Sort the objects and retrieve top n
-    sumColumns = sum(Sim);
-    keysIndex = keys(indexMapping);
-    for i = 1:size(keysIndex, 2)
-        index = indexMapping(char(keysIndex(i)));
-        vidFrame = keysIndex(i);
-        vidFrame = strsplit(char(vidFrame), ',');
-        videoNum = vidFrame(1);
-        frameNum = vidFrame(2);
-        ascosM = sumColumns(index);
-        arrayAscos(i) = AscosRank(videoNum, frameNum, ascosM);
-    end
-    
-    arraySize = size(arrayAscos, 2);
-    [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
-    for random = 1:arraySize
-        disp(arrayAscos(index(random)));
-    end
+%     %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
+%     %Sort the objects and retrieve top n
+%     sumColumns = sum(Sim);
+%     keysIndex = keys(indexMapping);
+%     for i = 1:size(keysIndex, 2)
+%         index = indexMapping(char(keysIndex(i)));
+%         vidFrame = keysIndex(i);
+%         vidFrame = strsplit(char(vidFrame), ',');
+%         videoNum = vidFrame(1);
+%         frameNum = vidFrame(2);
+%         ascosM = sumColumns(index);
+%         arrayAscos(i) = AscosRank(videoNum, frameNum, ascosM);
+%     end
+%     
+%     arraySize = size(arrayAscos, 2);
+%     [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
+%     for random = 1:arraySize
+%         disp(arrayAscos(index(random)));
+%     end
 end

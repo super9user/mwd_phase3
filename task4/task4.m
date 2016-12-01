@@ -17,6 +17,9 @@ function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2S
     end
     
     clear nodeVideoMapping;
+%     nodeVideoMapping ith Index -> ith VideoNode Object
+%     indexMapping ('VidNum,FrameNum') key -> Index for this combination
+% X is transition matrix
 
     z=1;
     totalNodes = numPoints/k;

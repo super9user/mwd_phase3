@@ -1,7 +1,8 @@
-function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
+function [ orderedPageRank ] = task3(videoDirectory, dataFileName, m)
 
+tic
     M = preProcess(dataFileName);
-
+    
     M_VideoMapFile=csvread('video_mappings_task3.csv');
     globalVideoIndex=containers.Map();
     for i=1:size(M_VideoMapFile)
@@ -70,7 +71,7 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
         pageRankMatrix(i)=VideoNode(videoNum,frameNum,pagerankvalue,sum);
     end
 
-    for i=1:10 % no of iterations
+    for i=1:25 % no of iterations
         i
         for j=1:totalNodes       
             obj=pageRankMatrix(j);
@@ -111,9 +112,13 @@ function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
         videostr=strcat (' Video Number - ',num2str(videoNum));
         videoName=strcat(' Video Name - ',vidKey);
         frameName=strcat (' Frame Number - ',num2str(frameNum));
-        title(strcat(videoName,videostr,frameName,pageRank));
-        figure; imshow(img)
+       
+        imshow(img)
+        title(strcat(videoName,videostr,frameName,pageRank))
+        if(j~=m) 
+            figure();
+        end
         imwrite(img,'pageRankFrames.tif','WriteMode','append');
     end
-    
+   toc 
 end
