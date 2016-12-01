@@ -1,4 +1,4 @@
-function [ orderedPageRank ] = task3(videoDirectory, dataFileName, m)
+function [ orderedPageRank ] = pageRankTask3(videoDirectory, dataFileName, m)
 
 tic
     M = preProcess(dataFileName);
@@ -71,9 +71,10 @@ tic
         pageRankMatrix(i)=VideoNode(videoNum,frameNum,pagerankvalue,sum);
     end
 
-    for i=1:25 % no of iterations
+    for i=1:100 % no of iterations
         i
         for j=1:totalNodes       
+            
             obj=pageRankMatrix(j);
             strVideo=num2str(obj.videoNum);
             strFrame=num2str(obj.frameNum);
