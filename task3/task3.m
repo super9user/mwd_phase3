@@ -1,27 +1,20 @@
 function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
 
-    text=fileread(dataFileName);
-    text = strrep(text,'<','');
-    text = strrep(text,'>','');
-    text = strrep(text,'{','');
-    text = strrep(text,'}','');
+    M = preProcess(dataFileName);
 
-    fileID = fopen('temp.txt','w');
-    fprintf(fileID,text);
-    fclose(fileID);
-    M = csvread('temp.txt');
     M_VideoMapFile=csvread('video_mappings_task3.csv');
     globalVideoIndex=containers.Map();
     for i=1:size(M_VideoMapFile)
-     x=M_VideoMapFile(i,:);
-     key=num2str(x(1));
-     vidnum=num2str(x(2));
-     videostr=strcat(vidnum,'.mp4');
-     globalVideoIndex(key)=videostr;
+        x=M_VideoMapFile(i,:);
+        key=num2str(x(1));
+        vidnum=num2str(x(2));
+        videostr=strcat(vidnum,'.mp4');
+        globalVideoIndex(key)=videostr;
     end
     [numPoints, ~]=size(M);
     startingVideo=M(1,1);
     startingFrame=M(1,2);
+
     k=0;
     for i=1:numPoints
         x1=M(i,1);
