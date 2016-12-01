@@ -1,9 +1,17 @@
-function [] = personalizedAscosMeasures(vid1, frame1, vid2, frame2, vid3, frame3)
+function [] = personalizedAscosMeasures(videoDirectory, dataFileName, m,vidFrame1, vidFrame2, vidFrame3)
     tic 
-    InputMatrix = preProcess('filename_d_k.gspc');
-    vidFrame1 = strcat(num2str(vid1), ',', num2str(frame1));
-    vidFrame2 = strcat(num2str(vid2), ',', num2str(frame2));
-    vidFrame3 = strcat(num2str(vid3), ',', num2str(frame3));
+    InputMatrix = preProcess(dataFileName);
+    M_VideoMapFile=csvread('video_mappings_task3.csv');
+    globalVideoIndex=containers.Map();
+    for i=1:size(M_VideoMapFile)
+        x=M_VideoMapFile(i,:);
+        key=num2str(x(1));
+        vidnum=num2str(x(2));
+        videostr=strcat(vidnum,'.mp4');
+        globalVideoIndex(key)=videostr;
+    end
+
+    
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
     startingFrame=InputMatrix(1,2);
@@ -73,7 +81,7 @@ function [] = personalizedAscosMeasures(vid1, frame1, vid2, frame2, vid3, frame3
     parfor i = 1:size(adjMatrix, 1)
         i
         BMatrix = (1 - c)*IdentityMat(:,i);
-        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 25);
+        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 10);
     end
    %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
    %Sort the objects and retrieve top n
@@ -90,8 +98,34 @@ function [] = personalizedAscosMeasures(vid1, frame1, vid2, frame2, vid3, frame3
    end
    arraySize = size(arrayAscos, 2);
    [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
-   for random = 1:arraySize
-        disp(arrayAscos(index(random)));
-   end
+%    for random = 1:arraySize
+%         disp(arrayAscos(index(random)));
+%    end
+
+ for j=1:m
+        obj=(arrayAscos(index(j)));
+        videoNum=char(obj.dVideoNum);
+        frameNum=char(obj.dFrameNum);
+        vidKey=globalVideoIndex(videoNum);
+        videoObj=VideoReader(strcat(videoDirectory,vidKey));
+        img=read(videoObj,str2double(frameNum));
+        pageRank=strcat(' ASCOSPPR++ - ',num2str(obj.ascosRankValue)); 
+        videostr=strcat (' Video Number - ',num2str(videoNum));
+        videoName=strcat(' Video Name - ',vidKey);
+       
+        frameName=strcat (' Frame Number - ',num2str(frameNum));
+       
+        imshow(img)
+        title(strcat(videoName,videostr,frameName,pageRank))
+        if(j~=m) 
+            figure();
+        end
+        imwrite(img,'ascosFramesPPR.tif','WriteMode','append');
+    end
+
   toc
 end
+
+
+
+
