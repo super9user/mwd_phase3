@@ -26,7 +26,7 @@ function [X] = jacobi(A, B, P, delta, maxIters)
         err=abs(norm(X'-P));
         relerr=err/(norm(X)+eps);
         P=X';
-        if (err<delta) || (relerr<delta)
+        if (err < delta) || (relerr < delta)
             break;
         end
     end

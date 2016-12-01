@@ -1,6 +1,9 @@
-function [] = ascosMeasures()
-    tic;
+function [] = personalizedAscosMeasures(vid1, frame1, vid2, frame2, vid3, frame3)
+    tic 
     InputMatrix = preProcess('filename_d_k.gspc');
+    vidFrame1 = strcat(num2str(vid1), ',', num2str(frame1));
+    vidFrame2 = strcat(num2str(vid2), ',', num2str(frame2));
+    vidFrame3 = strcat(num2str(vid3), ',', num2str(frame3));
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
     startingFrame=InputMatrix(1,2);
@@ -14,10 +17,11 @@ function [] = ascosMeasures()
             break;
         end
     end
+    
 
     z=1;
     totalNodes = numPoints/k;
-
+    
     indexMapping = containers.Map();
     for i=1:totalNodes
         currentRow = InputMatrix(z,:);
@@ -27,7 +31,7 @@ function [] = ascosMeasures()
         indexMapping(keystr) = i;
         z=z+k;
     end
-
+    
     % Fill transition matrix X
     X = zeros(totalNodes,totalNodes);
     z=1;
@@ -39,57 +43,55 @@ function [] = ascosMeasures()
             destVidNum = currentRow(3);
             destFrameNum = currentRow(4);
             simValue = currentRow(5);
-
+            
             sourceKeystr = strcat(num2str(sourceVidNum),',',num2str(sourceFrameNum));
             destKeystr = strcat(num2str(destVidNum),',',num2str(destFrameNum));
-
+            
             sourceIndex = indexMapping(sourceKeystr);
             destIndex = indexMapping(destKeystr);
-
+            
             X(sourceIndex, destIndex) = simValue;
             X(destIndex, sourceIndex) = simValue;
             z=z+1;
         end
     end
-    toc;
-    
     GuessMatrix = X;
     adjMatrix = X;
     clear X;
     idx = find(GuessMatrix ~= 0);
     GuessMatrix(idx) = 1;
+    weightIdx(1) = indexMapping(vidFrame1);
+    weightIdx(2) = indexMapping(vidFrame2);
+    weightIdx(3) = indexMapping(vidFrame3);
+    GuessMatrix(weightIdx) = 2 * GuessMatrix(weightIdx);
     P = normcSum(adjMatrix);
     Ones = ones(size(adjMatrix));
     Q = P.*(Ones - exp(-(adjMatrix)));
     IdentityMat = eye(size(adjMatrix, 1));
     c = 0.9;
     AMatrix = (IdentityMat - (c .* Q'));
-    
-    clear Sim;
-    tic;
     parfor i = 1:size(adjMatrix, 1)
-        BMatrix = (1 - c) * IdentityMat(:,i);
-        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 10);
+        i
+        BMatrix = (1 - c)*IdentityMat(:,i);
+        Sim(:, i) = jacobi(AMatrix, BMatrix, GuessMatrix(:, i), c, 25);
     end
-    toc;
-    
-%     %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
-%     %Sort the objects and retrieve top n
-%     sumColumns = sum(Sim);
-%     keysIndex = keys(indexMapping);
-%     for i = 1:size(keysIndex, 2)
-%         index = indexMapping(char(keysIndex(i)));
-%         vidFrame = keysIndex(i);
-%         vidFrame = strsplit(char(vidFrame), ',');
-%         videoNum = vidFrame(1);
-%         frameNum = vidFrame(2);
-%         ascosM = sumColumns(index);
-%         arrayAscos(i) = AscosRank(videoNum, frameNum, ascosM);
-%     end
-%     
-%     arraySize = size(arrayAscos, 2);
-%     [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
-%     for random = 1:arraySize
-%         disp(arrayAscos(index(random)));
-%     end
+   %calculate sum of all columns in an array, add it to an object containing dVideo and dFrame.
+   %Sort the objects and retrieve top n
+   sumColumns = sum(Sim);
+   keysIndex = keys(indexMapping);
+   for i = 1:size(keysIndex, 2)
+        index = indexMapping(char(keysIndex(i)));
+        vidFrame = keysIndex(i);
+        vidFrame = strsplit(char(vidFrame), ',');
+        videoNum = vidFrame(1);
+        frameNum = vidFrame(2);
+        ascosM = sumColumns(index);
+        arrayAscos(i) = AscosRank(videoNum, frameNum, ascosM);
+   end
+   arraySize = size(arrayAscos, 2);
+   [~, index] = sort([arrayAscos.ascosRankValue], 'descend');
+   for random = 1:arraySize
+        disp(arrayAscos(index(random)));
+   end
+  toc
 end
