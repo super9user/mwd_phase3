@@ -1,11 +1,11 @@
 function [ ] = AscosSim()
 
+    tic;
     dataFileName = 'filename_d_k.gspc';
     k=5;
     m=3;
 
     M = preProcess(dataFileName);
-    disp(M);
 
     [numPoints, y] = size(M);
     z=1;
@@ -55,6 +55,7 @@ function [ ] = AscosSim()
             dVideo = num2str(dVideoNum);
             dFrameNum = obj.destinationFrame;
             dFrame = num2str(dFrameNum);
+            
             ascosRankValue=obj.simValue/100;
             mapKey=strcat(sVideo,',',sFrame,',',dVideo,',',dFrame);
             globalAscosRankMap(mapKey)= AscosVideoNode(sVideoNum,sFrameNum,dVideoNum,dFrameNum,ascosRankValue);
@@ -62,7 +63,7 @@ function [ ] = AscosSim()
             counter=counter+1;
         end
     end
-
+    toc;
 
     ascosRankIndex = containers.Map();
     frameVideoArray = frameVideos();
@@ -72,30 +73,33 @@ function [ ] = AscosSim()
     for i=1:maxIters % no of iterations
         count = 1;
         for j=1:counter
-            objI=frameVideoArray(j);
+            disp(j);
+            tic;
+            objI = frameVideoArray(j);
+            sVideo = num2str(objI.video);
+            sFrame = num2str(objI.frame);
+            
             for k = 1:counter
                 objJ = frameVideoArray(k);
-                sVideo=num2str(objI.video);
-                sFrame=num2str(objI.frame);
                 dVideo = num2str(objJ.video);
                 dFrame = num2str(objJ.frame);
-                mapK=strcat(sVideo,',',sFrame,',',dVideo,',',dFrame);
-                mapK
-                ascosRank=c*findSum(objI, objJ, globalAscosRankMap, globalOutgoingMatrix);
-                if i == maxIters
-                    if ascosRank > 0
-                        rKey = strcat(dVideo,',',dFrame);
-                        if(isKey(ascosRankIndex, rKey))
-                            temp = ascosRankIndex(rKey);
-                            temp = temp + ascosRank;
-                            ascosRankIndex(rKey) = temp;
-                        else
-                            ascosRankIndex(rKey) = ascosRank;
-                        end
+                mapK = strcat(sVideo,',',sFrame,',',dVideo,',',dFrame);
+                
+                ascosRank = c * findSum(sVideo, sFrame, dVideo, dFrame, globalAscosRankMap, globalOutgoingMatrix);
+                if i == maxIters && ascosRank > 0
+                    rKey = strcat(dVideo,',',dFrame);
+                    if(isKey(ascosRankIndex, rKey))
+                        temp = ascosRankIndex(rKey);
+                        temp = temp + ascosRank;
+                        ascosRankIndex(rKey) = temp;
+                    else
+                        ascosRankIndex(rKey) = ascosRank;
                     end
                 end
                 globalAscosRankMap(mapK)= AscosVideoNode(sVideo, sFrame, dVideo, dFrame, ascosRank);
             end
+            toc;
+            
         end
     end
 
