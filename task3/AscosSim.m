@@ -23,7 +23,6 @@ globalOutgoingMatrix = containers.Map(); % map where incoming node is the key
 globalAscosRankMap = containers.Map(); % map where every node( 'SourceVideo,SourceFrame,DestVideo, DestFrame' is a key)
 
 for i=1:totalNodes
-    
     for j=1:k    
         x=M(z+j-1,1:5);
         videostr=num2str(x(1));
