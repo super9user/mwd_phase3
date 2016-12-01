@@ -1,6 +1,15 @@
 function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2Str, seed3Str )
 
     InputMatrix = preProcess(dataFileName);
+    M_VideoMapFile=csvread('video_mappings_task3.csv');
+    globalVideoIndex=containers.Map();
+    for i=1:size(M_VideoMapFile)
+        x=M_VideoMapFile(i,:);
+        key=num2str(x(1));
+        vidnum=num2str(x(2));
+        videostr=strcat(vidnum,'.mp4');
+        globalVideoIndex(key)=videostr;
+    end
 
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
@@ -68,7 +77,6 @@ function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2S
 
     [prValues, idx]=sort(rprScore, 'descend');
     
-    load 'globalVideoIndex.mat';
     for j=1:m
         currIdx = idx(j);
         pageRankObject = nodeVideoMapping(currIdx);
@@ -79,13 +87,16 @@ function [ rprScore ] = task4( videoDirectory, dataFileName, m, seed1Str, seed2S
         
         videoObj=VideoReader(strcat(videoDirectory,vidKey));
         img=read(videoObj,frameNum);
-        pageRank=strcat(' PageRank - ',num2str(prValues(currIdx))); 
+        pageRank=strcat(' PersonalizedPageRank - ',num2str(prValues(currIdx))); 
         videostr=strcat (' Video Number - ',num2str(videoNum));
         videoName=strcat(' Video Name - ',vidKey);
         frameName=strcat (' Frame Number - ',num2str(frameNum));
-        title(strcat(videoName,videostr,frameName,pageRank));
-        figure; imshow(img)
-        imwrite(img,'pageRankFrames.tif','WriteMode','append');
+        imshow(img)
+        title(strcat(videoName,videostr,frameName,pageRank))
+        if(j~=m) 
+            figure();
+ 
+        imwrite(img,'pageRankFramesPPR.tif','WriteMode','append');
     end
     
 end
