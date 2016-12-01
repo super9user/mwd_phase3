@@ -1,4 +1,4 @@
-function [ orderedPageRank ] = task3( videoDirectory, dataFileName, m)
+function [ orderedPageRank ] = task3(videoDirectory, dataFileName, m)
 
 tic
     M = preProcess(dataFileName);
@@ -112,8 +112,12 @@ tic
         videostr=strcat (' Video Number - ',num2str(videoNum));
         videoName=strcat(' Video Name - ',vidKey);
         frameName=strcat (' Frame Number - ',num2str(frameNum));
-        title(strcat(videoName,videostr,frameName,pageRank));
-        figure; imshow(img)
+       
+        imshow(img)
+        title(strcat(videoName,videostr,frameName,pageRank))
+        if(j~=m) 
+            figure();
+        end
         imwrite(img,'pageRankFrames.tif','WriteMode','append');
     end
    toc 
