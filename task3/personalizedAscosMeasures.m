@@ -1,7 +1,9 @@
-%function [] = ascosMeasures()
-tic
-InputMatrix = preProcess('filename_d_k.gspc');
-
+function [] = personalizedAscosMeasures(vid1, frame1, vid2, frame2, vid3, frame3)
+    tic 
+    InputMatrix = preProcess('filename_d_k.gspc');
+    vidFrame1 = strcat(num2str(vid1), ',', num2str(frame1));
+    vidFrame2 = strcat(num2str(vid2), ',', num2str(frame2));
+    vidFrame3 = strcat(num2str(vid3), ',', num2str(frame3));
     [numPoints, ~]=size(InputMatrix);
     startingVideo=InputMatrix(1,1);
     startingFrame=InputMatrix(1,2);
@@ -58,6 +60,10 @@ InputMatrix = preProcess('filename_d_k.gspc');
     clear X;
     idx = find(GuessMatrix ~= 0);
     GuessMatrix(idx) = 1;
+    weightIdx(1) = indexMapping(vidFrame1);
+    weightIdx(2) = indexMapping(vidFrame2);
+    weightIdx(3) = indexMapping(vidFrame3);
+    GuessMatrix(weightIdx) = 2 * GuessMatrix(weightIdx);
     P = normcSum(adjMatrix);
     Ones = ones(size(adjMatrix));
     Q = P.*(Ones - exp(-(adjMatrix)));
@@ -88,4 +94,4 @@ InputMatrix = preProcess('filename_d_k.gspc');
         disp(arrayAscos(index(random)));
    end
   toc
-%end
+end
