@@ -13,18 +13,20 @@ function [] = pcaReductionSift(filename, k)
         fprintf(filename1, '%.6f', reducedMatrix(i, k));
         fprintf(filename1, ']}\n');  
     end
+
+    eigenValues = eig(cov(completeMatrix));
+    eigenValues = normc(eigenValues);
+    [ev order] = sort(eigenValues, 'descend');
+    for i = 1:k
+        fprintf(filename2, '<');
+        fprintf(filename2, '%d ', order(i));
+        fprintf(filename2, ',');
+        fprintf(filename2, '%.6f', ev(i)); 
+        fprintf(filename2, '> ');                 
+        fprintf(filename2, '\n');
+    end
+    
+    fclose(filename1);
+    fclose(filename2);
     toc
-%     completeMatrix = combineToOneMatrix(globalMap);
-%     eigenValues = eig(cov(completeMatrix));
-%     eigenValues = normc(eigenValues);
-%     [ev order] = sort(eigenValues, 'descend');
-%     for i = 1:k
-%         fprintf(filename2, '<');
-%         fprintf(filename2, '%d ', order(i));
-%         fprintf(filename2, ',');
-%         fprintf(filename2, '%.6f', ev(i)); 
-%         fprintf(filename2, '> ');                 
-%         fprintf(filename2, '\n');
-%     end
-%     toc
 end
