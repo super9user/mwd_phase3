@@ -37,7 +37,7 @@ function [ videoFramePairSimMap, totalLength, uniqueLength ] = getSiftsInInputSe
         uniqueVideoFrameOfSet1 = allVideosFrames(allSIFTIndexesOfSet1,:);
         
         [rows, cols] = size(uniqueSIFTOfSet1);
-        [rows1, cols2] = size(uniqueSIFTOfSet1);
+        [rows1, cols2] = size(allSIFTOfSet1);
         
         totalLength = totalLength + rows1;
         uniqueLength = uniqueLength + rows;
