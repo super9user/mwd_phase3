@@ -1,11 +1,11 @@
 function [  ] = task6(  )
     tic;
     lshFile = 'filename_d.lsh';
-    object = '<15;28;<0,0>;<200,300>>';
+    object = '<54;10;<0,0>;<200,300>>';
     pcaFile = 'filename_d10.spca';
-    k = 4;
-    n = 2;
-    layers = 2;
+    k = 5;
+    n = 20;
+    layers = 3;
     matfileName = 'hashFunctionFamily.mat';
     videoDirectory = '/Users/tanmay/Development/Matlab/mwd_phase3/Demo_Videos_Phase3/Demo_Videos/';
     
@@ -36,7 +36,11 @@ function [  ] = task6(  )
 %     dimension = size(allSiftVectors, 1);
     hashTable = hashVectors(allSiftVectorsTrans, hashFunctionFamily, w, layers, buckets);
     set1 = getSet1(hashTable);
-    videoFramePairSimMap = getSiftsInInputSets( inputObject.videoNum, set1, LSHMatrix, PCAMatrix, allSiftVectors);
+    [videoFramePairSimMap, tl, ul] = getSiftsInInputSets( inputObject.videoNum, set1, LSHMatrix, PCAMatrix, allSiftVectors);
+    
+    disp(tl);
+    disp(ul);
+    
     vals = values(videoFramePairSimMap);
     vals = cell2mat(vals);
     [~, idx] = sort(vals);
@@ -64,7 +68,7 @@ function [  ] = task6(  )
         if(j~=n) 
             figure();
         end
-        imwrite(img,'task6.tif','WriteMode','append');
+        imwrite(img,'task6_part2.tif','WriteMode','append');
     end
 
 end

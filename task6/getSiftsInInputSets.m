@@ -1,11 +1,15 @@
-function [ videoFramePairSimMap ] = getSiftsInInputSets( inputVideoNum, set1, LSHMatrix, PCAMatrix, allSiftVectors)
+function [ videoFramePairSimMap, totalLength, uniqueLength ] = getSiftsInInputSets( inputVideoNum, set1, LSHMatrix, PCAMatrix, allSiftVectors)
 
     layerBucketPairs = keys(set1);
     videoFramePairSimMap = containers.Map();
     
+    totalLength = 0;
+    uniqueLength = 0;
+    
     for i=1:length(layerBucketPairs)
         localvideoFramePairSimMap = containers.Map();
         localvideoFrameSimCountMap = containers.Map();
+        
         currPair = layerBucketPairs(i);
         splitPair = strsplit(char(currPair), ',');
         layer = str2double(splitPair(1));
@@ -25,7 +29,6 @@ function [ videoFramePairSimMap ] = getSiftsInInputSets( inputVideoNum, set1, LS
         videoFrameMat = filteredBucket(:,3:4);
         
         
-        
         allVideosFrames = PCAMatrix(:,1:2);
         allIndexesOfSet1 = find(ismember(allVideosFrames, videoFrameMat, 'rows'));
         
@@ -34,13 +37,10 @@ function [ videoFramePairSimMap ] = getSiftsInInputSets( inputVideoNum, set1, LS
         uniqueVideoFrameOfSet1 = allVideosFrames(allSIFTIndexesOfSet1,:);
         
         [rows, cols] = size(uniqueSIFTOfSet1);
+        [rows1, cols2] = size(uniqueSIFTOfSet1);
         
-        disp('-----');
-        disp('uniqueSIFTofSet1 size for i');
-        disp(i)
-        disp(rows);
-        disp(cols);
-        disp('-----');
+        totalLength = totalLength + rows1;
+        uniqueLength = uniqueLength + rows;
         
         distanceMat = pdist2(allSiftVectors, uniqueSIFTOfSet1);
         MeanMat = mean(distanceMat);
@@ -66,7 +66,7 @@ function [ videoFramePairSimMap ] = getSiftsInInputSets( inputVideoNum, set1, LS
             localSim = localvideoFramePairSimMap(currKey);
             localCount = localvideoFrameSimCountMap(currKey);
             diffBetweenUniqueAndAll = length(allSIFTOfSet1) - length(uniqueSIFTOfSet1) + 1;
-            simValue = (localSim/(localCount * diffBetweenUniqueAndAll * set1(char(currPair))));
+            simValue = (localSim/(localCount * diffBetweenUniqueAndAll * set1(char(currPair)) ));
             if(~isKey(videoFramePairSimMap, currKey))
                 videoFramePairSimMap(currKey) = 0;
             end
